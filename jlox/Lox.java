@@ -15,7 +15,9 @@ import java.util.List;
  *          https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
  */
 public class Lox {
+	private static final Interpreter interpreter = new Interpreter();
 	static boolean hadError = false;
+	static boolean hadRuntimeError = false;
 
 	public static void main(String[] args) throws IOException {
 		if (args.length > 1) {
@@ -38,6 +40,10 @@ public class Lox {
 		// We’ll use this to ensure we don’t try to execute code that has a known error.
 		if (hadError) {
 			System.exit(65);
+		}
+
+		if (hadRuntimeError) {
+			System.exit(70);
 		}
 	}
 
@@ -70,7 +76,7 @@ public class Lox {
 			return;
 		}
 
-		System.out.println(new AstPrinter().print(expression));
+		interpreter.interpret(expression);
 	}
 
 	static void error(int line, String message) {
@@ -92,5 +98,15 @@ public class Lox {
 		} else {
 			report(token.line, " at '" + token.lexeme + "'", message);
 		}
+	}
+
+	/**
+	 * If a runtime error is thrown while evaluating the expression, interpret()
+	 * catches it. This lets us report the error to the user and then gracefully
+	 * continue.
+	 */
+	static void runtimeError(RuntimeError error) {
+		System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+		hadRuntimeError = true;
 	}
 }
