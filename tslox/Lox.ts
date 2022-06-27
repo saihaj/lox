@@ -22,9 +22,9 @@ export class Lox {
   }
 
   /**
-  * If you start tslox from the command line and give it a path to a file, it
-  * reads the file and executes it.
-  */
+   * If you start tslox from the command line and give it a path to a file, it
+   * reads the file and executes it.
+   */
   private static async runFile(path: string) {
     const text = await Deno.readTextFile(path);
     this.run(text);
